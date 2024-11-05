@@ -1,5 +1,6 @@
 ﻿using EduConnect.Core.Configuration;
 using EduConnect.Core.DTOs;
+using EduConnect.Core.Models;
 using EduConnect.Services.Abstract;
 using EduConnect.Services.Common.JwtService;
 using Microsoft.AspNetCore.Identity;
@@ -19,9 +20,9 @@ namespace EduConnect.Services.ConcreteTokenService
     public class TokenManager : ITokenService
     {
         private readonly CustomTokenOption _tokenOption;
-        private readonly UserManager<UserDto> _userManager;
+        private readonly UserManager<User> _userManager;
 
-        public TokenManager(UserManager<UserDto> userManager, IOptions<CustomTokenOption> options)
+        public TokenManager(UserManager<User> userManager, IOptions<CustomTokenOption> options)
         {
             _userManager = userManager;
             _tokenOption = options.Value;

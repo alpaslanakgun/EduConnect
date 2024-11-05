@@ -10,9 +10,11 @@ using EduConnect.Services.Abstract;
 using EduConnect.Services.Common.JwtService;
 using EduConnect.Services.Concrete;
 using EduConnect.Services.ConcreteTokenService;
-using Microsoft.AspNetCore.Authentication;
+using EduConnect.Services.Mapping;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using IAuthenticationService = EduConnect.Services.Abstract.IAuthenticationService;
@@ -24,48 +26,44 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.ConnectionString));
+
+
+builder.Services.AddIdentity<User, IdentityRole>(options =>
+{
+    options.User.RequireUniqueEmail = true;
+    options.Password.RequireNonAlphanumeric = false;
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
 
 //Dependency Injection 
 builder.Services.AddScoped<IAuthenticationService, AuthenticationManager>();
-builder.Services.AddScoped<IStudentService, StudentManager>();
+builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddScoped<IUserService, UserManagerService>();
 builder.Services.AddScoped<ITokenService, TokenManager>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-builder.Services.AddIdentity<User, IdentityRole>(Opt =>
-{
-    Opt.User.RequireUniqueEmail = true;
-    Opt.Password.RequireNonAlphanumeric = false;
-}).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+
+builder.Services.AddAutoMapper(typeof(MapProfile));
+
+
 
 builder.Services.Configure<CustomTokenOption>(builder.Configuration.GetSection("TokenOption"));
 
 builder.Services.Configure<List<Client>>(builder.Configuration.GetSection("Clients"));
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, opts =>
-{
-    var tokenOptions = builder.Configuration.GetSection("TokenOption").Get<CustomTokenOption>();
-    opts.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidIssuer = tokenOptions.Issuer,
-        ValidAudience = tokenOptions.Audience[0],
-        IssuerSigningKey = SignService.GetSymmetricSecurityKey(tokenOptions.SecurityKey),
+var tokenOptions = builder.Configuration.GetSection("TokenOption").Get<CustomTokenOption>();
 
-        ValidateIssuerSigningKey = true,
-        ValidateAudience = true,
-        ValidateIssuer = true,
-        ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero
-    };
-});
 builder.Services.AddCors(options => options.AddDefaultPolicy(builder =>
 {
     builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
 }));
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
 
 
 

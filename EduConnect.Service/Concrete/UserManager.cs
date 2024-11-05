@@ -20,7 +20,6 @@ namespace EduConnect.Services.Concrete
             _identityUserManager = userManager;
             _mapper = mapper;
         }
-
         public async Task<IDataResult<UserDto>> CreateUserAsync(CreateUserDto createUserDto)
         {
             var user = new User
@@ -37,7 +36,7 @@ namespace EduConnect.Services.Concrete
                 return new ErrorDataResult<UserDto>(string.Join(", ", errors));
             }
 
-            var userDto = _mapper.Map<UserDto>(user);
+            var userDto = _mapper.Map<UserDto>(user); 
             return new SuccessDataResult<UserDto>(userDto, UserAuthenticationMessageConstant.UserSuccessful);
         }
 
@@ -51,5 +50,6 @@ namespace EduConnect.Services.Concrete
             var userDto = _mapper.Map<UserDto>(user);
             return new SuccessDataResult<UserDto>(userDto);
         }
+
     }
 }

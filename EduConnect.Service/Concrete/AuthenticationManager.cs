@@ -43,21 +43,20 @@ namespace EduConnect.Services.Concrete
 
         public async Task<IDataResult<TokenDto>> CreateTokenAsync(LoginDto loginDto)
         {
-        
             if (loginDto == null) throw new ArgumentNullException(nameof(loginDto));
 
-         
             var user = await _userManager.FindByEmailAsync(loginDto.Email);
 
             if (user == null)
                 return new ErrorDataResult<TokenDto>(UserAuthenticationMessageConstant.EmailOrPasswordWrong);
 
-
             if (!await _userManager.CheckPasswordAsync(user, loginDto.Password))
                 return new ErrorDataResult<TokenDto>(UserAuthenticationMessageConstant.EmailOrPasswordWrong);
 
+          
             var userDto = _mapper.Map<UserDto>(user);
             var tokenDto = _tokenService.CreateToken(userDto);
+
             var userRefreshToken = await _userRefreshTokenService
                 .Where(x => x.UserId == user.Id)
                 .SingleOrDefaultAsync();
@@ -73,17 +72,14 @@ namespace EduConnect.Services.Concrete
             }
             else
             {
-           
                 userRefreshToken.Code = tokenDto.RefreshToken;
                 userRefreshToken.Expiration = tokenDto.RefreshTokenExpiration;
             }
 
-        
             await _unitOfWork.CommitAsync();
 
             return new SuccessDataResult<TokenDto>(tokenDto);
         }
-
 
         public async Task<IDataResult<ClientTokenDto>> CreateTokenByClient(ClientLoginDto clientLoginDto)
         {
