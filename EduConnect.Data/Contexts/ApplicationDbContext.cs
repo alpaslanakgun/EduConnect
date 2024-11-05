@@ -7,12 +7,13 @@ using EduConnect.Core.Models;
 
 namespace EduConnect.Data.Context
 {
-    public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<int>, int>
+    public class ApplicationDbContext : IdentityDbContext<User, IdentityRole, string>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         public DbSet<Student> Students { get; set; } 
-        public DbSet<Course> Courses { get; set; }   
+        public DbSet<Course> Courses { get; set; }
+        public DbSet<UserRefreshToken> UserRefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

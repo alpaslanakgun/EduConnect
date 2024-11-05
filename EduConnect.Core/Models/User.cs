@@ -4,14 +4,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EduConnect.Core.Models
 {
-    public class User : IdentityUser<int>
+    public class User : IdentityUser
     {
-        public string Name { get; set; }
+  
+        public string UserName { get; set; }
+        public string Email { get; set; }
 
 
-
-        [NotMapped]
-        public string[] Roles { get; set; }
     }
 }
 

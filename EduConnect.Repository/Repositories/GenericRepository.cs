@@ -61,6 +61,11 @@ namespace EduConnect.Repository.Repositories
             await _context.Set<T>().AddAsync(entity);
             return entity;
         }
+        public IQueryable<T> Where(Expression<Func<T, bool>> predicate)
+        {
+            return _context.Set<T>().Where(predicate);
+        }
+       
 
         public async Task<T> UpdateAsync(T entity)
         {
