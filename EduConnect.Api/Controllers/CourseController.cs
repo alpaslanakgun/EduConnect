@@ -1,6 +1,8 @@
 ﻿using EduConnect.Api.Filters;
 using EduConnect.Core.DTOs;
+using EduConnect.Core.Entities;
 using EduConnect.Services.Abstract;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -13,16 +15,20 @@ namespace EduConnect.Api.Controllers
     public class CourseController : ControllerBase
     {
         private readonly ICourseService _courseService;
+        private readonly IValidator<CourseDto> _courseValidator;
 
-        public CourseController(ICourseService courseService)
+
+        public CourseController(ICourseService courseService, IValidator<CourseDto> courseValidator)
         {
             _courseService = courseService;
+            _courseValidator = courseValidator;
         }
 
         // GET: api/course/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
+
             var result = await _courseService.GetAsync(id);
             return result.Success ? Ok(result.Data) : NotFound(result.Message);
         }
@@ -36,11 +42,15 @@ namespace EduConnect.Api.Controllers
         }
 
         // POST: api/course
-        [Authorize]
         [HttpPost]
         [RoleAuthorize("Admin")]
         public async Task<IActionResult> Add(CourseDto courseDto)
         {
+            var validationResult = await _courseValidator.ValidateAsync(courseDto);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.Errors);
+            }
             var result = await _courseService.AddAsync(courseDto);
             return result.Success ? CreatedAtAction(nameof(Get), new { id = result.Data.Id }, result.Data) : BadRequest(result.Message);
         }

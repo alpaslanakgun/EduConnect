@@ -14,6 +14,6 @@ namespace EduConnect.Services.Abstract
 
         Task<IDataResult<UserDto>> GetUserByNameAsync(string userName);
         Task<IDataResult<UserDto>> AssignRoleToUserAsync(string userEmail, string role);
-
+        Task<IDataResult<List<string>>> GetUserRolesAsync(string userEmail);
     }
 }

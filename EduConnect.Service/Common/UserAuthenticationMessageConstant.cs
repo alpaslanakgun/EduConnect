@@ -16,6 +16,7 @@ namespace EduConnect.Services.Common
         public const string TokenCreationSuccessful = "Token başarıyla oluşturuldu.";
         public const string TokenUpdateSuccessful = "Token başarıyla güncellendi.";
         public const string ClientIdOrSecretNotFound = "ClientId veya Client Secret bulunamadı.";
+        public const string RoleAdded = "Rol Başarıyla Eklendi";
 
     }
 

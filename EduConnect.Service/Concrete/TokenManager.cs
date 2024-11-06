@@ -39,11 +39,10 @@ namespace EduConnect.Services.ConcreteTokenService
                 _tokenOption.Issuer,
                 expires: accessTokenExpiration,
                 notBefore: DateTime.Now,
-                claims: GetClaims(userDto, _tokenOption.Audience),
+                claims: GetClaims(userDto, _tokenOption.Audience), // Roller burada ekleniyor
                 signingCredentials: signingCredentials);
 
             var handler = new JwtSecurityTokenHandler();
-
             var token = handler.WriteToken(jwtSecurityToken);
 
             var tokenDto = new TokenDto
@@ -56,6 +55,7 @@ namespace EduConnect.Services.ConcreteTokenService
 
             return tokenDto;
         }
+
 
         public ClientTokenDto CreateTokenByClient(Client client)
         {
@@ -100,17 +100,20 @@ namespace EduConnect.Services.ConcreteTokenService
 
         private IEnumerable<Claim> GetClaims(UserDto userDto, List<string> audiences)
         {
-            var userList = new List<Claim>
-        {
-            new(ClaimTypes.NameIdentifier, userDto.Id.ToString()),
-            new(JwtRegisteredClaimNames.Email, userDto.Email),
-            new(ClaimTypes.Name, userDto.UserName),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
+        var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, userDto.Id.ToString()),
+        new Claim(ClaimTypes.Name, userDto.UserName),
+        new Claim(ClaimTypes.Email, userDto.Email)
+    };
 
-            userList.AddRange(audiences.Select(x => new Claim(JwtRegisteredClaimNames.Aud, x)));
+    // Kullanıcının rollerini ekleyin
+    foreach (var role in userDto.Roles)
+    {
+        claims.Add(new Claim(ClaimTypes.Role, role));
+    }
 
-            return userList;
+    return claims;
         }
 
         private IEnumerable<Claim> GetClaimsByClient(Client client)

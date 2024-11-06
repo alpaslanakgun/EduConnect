@@ -68,7 +68,20 @@ namespace EduConnect.Services.Concrete
             }
 
             var userDto = _mapper.Map<UserDto>(user);
-            return new SuccessDataResult<UserDto>(userDto, "Rol başarıyla atandı.");
+            return new SuccessDataResult<UserDto>(userDto, UserAuthenticationMessageConstant.RoleAdded);
         }
+        public async Task<IDataResult<List<string>>> GetUserRolesAsync(string userEmail)
+        {
+            var user = await _identityUserManager.FindByEmailAsync(userEmail);
+
+            if (user == null)
+            {
+                return new ErrorDataResult<List<string>>(UserAuthenticationMessageConstant.UserNotFound);
+            }
+
+            var roles = await _identityUserManager.GetRolesAsync(user);
+            return new SuccessDataResult<List<string>>(roles.ToList());
+        }
+
     }
 }

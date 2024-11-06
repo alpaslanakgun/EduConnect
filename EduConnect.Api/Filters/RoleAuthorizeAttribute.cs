@@ -22,7 +22,7 @@ namespace EduConnect.Api.Filters
                 return;
             }
 
-            await next(); // İzin veriliyorsa, sonraki işleme geç
+            await next(); // İzin veriliyorsa sonraki işleme geç
         }
     }
 }

@@ -19,7 +19,6 @@ namespace EduConnect.Core.Identity
                 var roleExist = await roleManager.RoleExistsAsync(roleName);
                 if (!roleExist)
                 {
-                    // Rol yoksa oluştur
                     await roleManager.CreateAsync(new IdentityRole(roleName));
                 }
             }

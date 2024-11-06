@@ -53,9 +53,14 @@ namespace EduConnect.Services.Concrete
             if (!await _userManager.CheckPasswordAsync(user, loginDto.Password))
                 return new ErrorDataResult<TokenDto>(UserAuthenticationMessageConstant.EmailOrPasswordWrong);
 
-          
+            // Kullanıcının rollerini al
+            var roles = await _userManager.GetRolesAsync(user);
+
+            // UserDto'yu oluştururken rollerini ekle
             var userDto = _mapper.Map<UserDto>(user);
-            var tokenDto = _tokenService.CreateToken(userDto);
+            userDto.Roles = roles.ToList(); // Roller burada atanır
+
+            var tokenDto = _tokenService.CreateToken(userDto); // Token burada oluşturulur
 
             var userRefreshToken = await _userRefreshTokenService
                 .Where(x => x.UserId == user.Id)
@@ -80,6 +85,7 @@ namespace EduConnect.Services.Concrete
 
             return new SuccessDataResult<TokenDto>(tokenDto);
         }
+
 
         public async Task<IDataResult<ClientTokenDto>> CreateTokenByClient(ClientLoginDto clientLoginDto)
         {

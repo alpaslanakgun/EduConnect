@@ -7,12 +7,12 @@ namespace EduConnect.Api.Validations
     {
         public CreateUserDtoValidator()
         {
-            RuleFor(x => x.Email).NotEmpty().WithMessage("Email is required").EmailAddress()
-                .WithMessage("Email is wrong");
+            RuleFor(x => x.Email).NotEmpty().WithMessage("Email zorunlu ").EmailAddress()
+                .WithMessage("Email zorunlu");
 
-            RuleFor(x => x.Password).NotEmpty().WithMessage("Password is required");
+            RuleFor(x => x.Password).NotEmpty().WithMessage("Password zorunlu");
 
-            RuleFor(x => x.UserName).NotEmpty().WithMessage("UserName is required");
+            RuleFor(x => x.UserName).NotEmpty().WithMessage("UserName zorunlu");
         }
     }
 }

@@ -1,3 +1,4 @@
+using EduConnect.Api.Validations;
 using EduConnect.Core.Configuration;
 using EduConnect.Core.Identity;
 using EduConnect.Core.Models;
@@ -11,7 +12,10 @@ using EduConnect.Services.Abstract;
 using EduConnect.Services.Common.JwtService;
 using EduConnect.Services.Concrete;
 using EduConnect.Services.ConcreteTokenService;
+using EduConnect.Services.Extensions;
 using EduConnect.Services.Mapping;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +32,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+builder.Services.AddValidatorsFromAssemblyContaining<CourseDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateUserDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<StudentDtoValidator>();
+
+
+
+
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.ConnectionString));
 
 
@@ -59,6 +71,7 @@ builder.Services.Configure<CustomTokenOption>(builder.Configuration.GetSection("
 
 builder.Services.Configure<List<Client>>(builder.Configuration.GetSection("Clients"));
 var tokenOptions = builder.Configuration.GetSection("TokenOption").Get<CustomTokenOption>();
+builder.Services.AddCustomTokenAuth(tokenOptions);
 
 builder.Services.AddCors(options => options.AddDefaultPolicy(builder =>
 {
@@ -103,6 +116,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

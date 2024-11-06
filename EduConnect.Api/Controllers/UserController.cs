@@ -1,5 +1,7 @@
-﻿using EduConnect.Core.DTOs;
+﻿using EduConnect.Api.Filters;
+using EduConnect.Core.DTOs;
 using EduConnect.Services.Abstract;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,15 +13,26 @@ namespace EduConnect.Api.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IValidator<CreateUserDto> _validator;
 
-        public UserController(IUserService userService)
+
+        public UserController(IUserService userService, IValidator<CreateUserDto> validator)
         {
             _userService = userService;
+            _validator = validator;
         }
         //api/user
         [HttpPost]
-        public async Task<IActionResult> CreateUser(CreateUserDto createUserDto)
-        { 
+        public async Task<IActionResult> CreateUser([FromBody]CreateUserDto createUserDto)
+        {
+
+
+            var validationResult = await _validator.ValidateAsync(createUserDto);
+
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.Errors);
+            }
             var userResult = await _userService.CreateUserAsync(createUserDto);
 
             return userResult.Success
@@ -27,8 +40,9 @@ namespace EduConnect.Api.Controllers
            : BadRequest(userResult.Message);
         }
 
-        [Authorize]
+   
         [HttpGet]
+        [RoleAuthorize("Admin")]
         public async Task<IActionResult> GetUser()
         {
              var getUser =await _userService.GetUserByNameAsync(HttpContext.User.Identity.Name);

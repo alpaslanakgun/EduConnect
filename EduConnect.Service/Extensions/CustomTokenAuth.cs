@@ -21,6 +21,8 @@ namespace EduConnect.Services.Extensions
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, opts =>
             {
+                opts.RequireHttpsMetadata = false;
+                opts.SaveToken = true;
                 opts.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidIssuer = tokenOptions.Issuer,
