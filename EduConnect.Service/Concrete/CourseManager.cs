@@ -37,6 +37,7 @@ namespace EduConnect.Services.Concrete
             return new ErrorDataResult<CourseDto>(CourseMessageConstant.NotFound);
         }
 
+
         public async Task<IDataResult<List<CourseDto>>> GetAllAsync()
         {
             var courses = await _courseRepository.GetAllAsync(c => !c.IsDeleted);
@@ -48,11 +49,15 @@ namespace EduConnect.Services.Concrete
             return new SuccessDataResult<List<CourseDto>>(courseDtos);
         }
 
+
+
         public async Task<IDataResult<CourseDto>> AddAsync(CourseDto courseDto)
         {
             try
             {
-                var course = _mapper.Map<Course>(courseDto); 
+                var course = _mapper.Map<Course>(courseDto);
+                course.CreatedDate = DateTime.Now; // Oluşturulma tarihi
+                course.IsActive = true; // Varsayılan olarak aktif
                 await _courseRepository.AddAsync(course);
                 await _unitOfWork.CommitAsync();
 
@@ -66,6 +71,7 @@ namespace EduConnect.Services.Concrete
         }
 
 
+
         public async Task<IDataResult<CourseDto>> UpdateAsync(CourseDto courseDto)
         {
             var existingCourse = await _courseRepository.GetAsync(c => c.Id == courseDto.Id);
@@ -73,11 +79,12 @@ namespace EduConnect.Services.Concrete
             if (existingCourse == null)
                 return new ErrorDataResult<CourseDto>(CourseMessageConstant.NotFound);
 
-            var course = _mapper.Map(courseDto, existingCourse);
-            var updatedCourse = await _courseRepository.UpdateAsync(course);
+            existingCourse = _mapper.Map(courseDto, existingCourse);
+            existingCourse.UpdatedDate = DateTime.Now; // Güncellenme tarihi
+            await _courseRepository.UpdateAsync(existingCourse);
             await _unitOfWork.CommitAsync();
 
-            var updatedDto = _mapper.Map<CourseDto>(updatedCourse);
+            var updatedDto = _mapper.Map<CourseDto>(existingCourse);
             return new SuccessDataResult<CourseDto>(updatedDto, CourseMessageConstant.UpdateSuccessful);
         }
 
@@ -88,7 +95,8 @@ namespace EduConnect.Services.Concrete
             if (course == null || course.IsDeleted)
                 return new ErrorDataResult<CourseDto>(CourseMessageConstant.AlreadyDeleted);
 
-            course.IsDeleted = true;
+            course.IsDeleted = true; // Soft delete
+            course.UpdatedDate = DateTime.UtcNow; // Güncellenme tarihi
             await _courseRepository.UpdateAsync(course);
             await _unitOfWork.CommitAsync();
 

@@ -103,8 +103,8 @@ namespace EduConnect.Services.ConcreteTokenService
             var userList = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, userDto.Id.ToString()),
-            new(JwtRegisteredClaimNames.Email, userDto.User.Email),
-            new(ClaimTypes.Name, userDto.User.UserName),
+            new(JwtRegisteredClaimNames.Email, userDto.Email),
+            new(ClaimTypes.Name, userDto.UserName),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 

@@ -18,23 +18,66 @@ namespace EduConnect.Services.Concrete
         private readonly IStudentRepository _studentRepository;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICourseRepository _courseRepository; 
 
-        public StudentManager(IStudentRepository studentRepository, IMapper mapper, IUnitOfWork unitOfWork)
+        public StudentManager(IStudentRepository studentRepository, IMapper mapper, IUnitOfWork unitOfWork, ICourseRepository courseRepository)
         {
             _studentRepository = studentRepository;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+            _courseRepository = courseRepository; 
         }
 
         public async Task<IDataResult<StudentDto>> AddAsync(StudentDto studentDto)
         {
+            var existingStudent = await _studentRepository.GetAsync(s => s.Email == studentDto.Email);
+            if (existingStudent != null)
+            {
+                return new ErrorDataResult<StudentDto>(StudentMessageConstant.StudentAlreadyExists);
+            }
+
             var student = _mapper.Map<Student>(studentDto);
+
+          
+            student.CreatedDate = DateTime.Now; 
+            student.UpdatedDate = DateTime.Now; 
+            student.IsActive = true; 
+            student.IsDeleted = false; 
+
+            // Öğrenciyi veritabanına ekleme
             await _studentRepository.AddAsync(student);
             await _unitOfWork.CommitAsync();
 
+            // Sonuç DTO'suna dönüştürme
             var studentResultDto = _mapper.Map<StudentDto>(student);
             return new SuccessDataResult<StudentDto>(studentResultDto, StudentMessageConstant.AddSuccessful);
         }
+        public async Task<IDataResult<StudentDto>> AddStudentWithCoursesAsync(StudentDto studentDto, List<int> courseIds)
+        {
+            // Var olan öğrenci kontrolü
+            var existingStudent = await _studentRepository.GetAsync(s => s.Email == studentDto.Email);
+            if (existingStudent != null)
+            {
+                return new ErrorDataResult<StudentDto>(StudentMessageConstant.StudentAlreadyExists);
+            }
+
+            var student = _mapper.Map<Student>(studentDto);
+            student.CreatedDate = DateTime.Now;
+            student.IsActive = true;
+
+            // Kursları al
+            var courses = await _courseRepository.GetAllAsync(c => courseIds.Contains(c.Id));
+            student.Courses = courses.ToList(); // Öğrencinin kurslarını ayarla
+
+            await _studentRepository.AddAsync(student); // Öğrenciyi ekle
+            await _unitOfWork.CommitAsync();
+
+            var resultDto = _mapper.Map<StudentDto>(student);
+            return new SuccessDataResult<StudentDto>(resultDto, StudentMessageConstant.AddSuccessful);
+        }
+
+
+
 
         public async Task<IDataResult<StudentDto>> DeleteAsync(int studentId)
         {
@@ -43,13 +86,16 @@ namespace EduConnect.Services.Concrete
             if (student == null || student.IsDeleted)
                 return new ErrorDataResult<StudentDto>(StudentMessageConstant.AlreadyDeleted);
 
-            student.IsDeleted = true;
+            // Soft delete işlemi
+            student.IsDeleted = true; // Kayıt silinmiş olarak işaretleniyor
+            student.UpdatedDate = DateTime.Now; // Güncellenme tarihi güncelleniyor
             await _studentRepository.UpdateAsync(student);
             await _unitOfWork.CommitAsync();
 
             var studentResultDto = _mapper.Map<StudentDto>(student);
             return new SuccessDataResult<StudentDto>(studentResultDto, StudentMessageConstant.DeletionSuccessful);
         }
+
 
         public async Task<IDataResult<List<StudentDto>>> GetAllAsync()
         {
@@ -80,11 +126,13 @@ namespace EduConnect.Services.Concrete
             if (student == null)
                 return new ErrorResult(StudentMessageConstant.NotFound);
 
+            // Kayıt veritabanından fiziksel olarak siliniyor
             await _studentRepository.DeleteAsync(student);
             await _unitOfWork.CommitAsync();
 
             return new SuccessResult(StudentMessageConstant.HardDeleteSuccessful);
         }
+
 
         public async Task<IDataResult<StudentDto>> UpdateAsync(StudentDto studentDto)
         {
@@ -94,11 +142,14 @@ namespace EduConnect.Services.Concrete
                 return new ErrorDataResult<StudentDto>(StudentMessageConstant.NotFound);
 
             student = _mapper.Map(studentDto, student);
+            student.UpdatedDate = DateTime.Now;
+
             await _studentRepository.UpdateAsync(student);
             await _unitOfWork.CommitAsync();
 
             var updatedStudentDto = _mapper.Map<StudentDto>(student);
             return new SuccessDataResult<StudentDto>(updatedStudentDto, StudentMessageConstant.UpdateSuccessful);
         }
+
     }
 }

@@ -16,5 +16,6 @@ namespace EduConnect.Services.Abstract
         Task<IDataResult<StudentDto>> UpdateAsync(StudentDto studentDto);   // Öğrenci bilgilerini güncelle
         Task<IDataResult<StudentDto>> DeleteAsync(int studentId);           // Öğrenciyi soft delete yap
         Task<IResult> HardDeleteAsync(int studentId);
+        Task<IDataResult<StudentDto>> AddStudentWithCoursesAsync(StudentDto studentDto, List<int> courseIds);
     }
 }

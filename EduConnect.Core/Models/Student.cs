@@ -15,6 +15,6 @@ namespace EduConnect.Core.Entities
         public string Email { get; set; }
 
 
-        public ICollection<Course> Courses { get; set; }
+        public ICollection<Course> Courses { get; set; } = new List<Course>(); 
     }
 }

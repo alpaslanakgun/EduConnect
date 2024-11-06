@@ -7,8 +7,11 @@ using System.Threading.Tasks;
 
 namespace EduConnect.Core.DTOs
 {
-    public class UserDto : BaseDto
+    public class UserDto 
     {
-        public User User { get; set; }
+        public string Id { get; set; }
+        public string Email { get; set; }
+        public string UserName { get; set; }
+
     }
 }

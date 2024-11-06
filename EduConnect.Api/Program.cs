@@ -39,8 +39,10 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 
 //Dependency Injection 
 builder.Services.AddScoped<IAuthenticationService, AuthenticationManager>();
-builder.Services.AddScoped<IStudentRepository, StudentRepository>();
-builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddScoped<IStudentService, StudentManager>();
+builder.Services.AddScoped<IStudentRepository,StudentRepository>();
+builder.Services.AddScoped<ICourseService, CourseManager>();
+builder.Services.AddScoped<ICourseRepository,CourseRepository>();
 builder.Services.AddScoped<IUserService, UserManagerService>();
 builder.Services.AddScoped<ITokenService, TokenManager>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));

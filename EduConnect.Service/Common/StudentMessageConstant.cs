@@ -18,5 +18,6 @@ namespace EduConnect.Services.Common
         public const string UpdateSuccessful = "Öğrenci güncelleme işlemi başarıyla gerçekleştirildi.";
         public const string AddSuccessful = "Öğrenci ekleme işlemi başarıyla gerçekleştirildi.";
         public const string HardDeleteSuccessful = "Öğrenci kalıcı olarak silindi.";
+        public const string StudentAlreadyExists = "Öğrenci zaten var";
     }
 }

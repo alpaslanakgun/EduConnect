@@ -15,6 +15,6 @@ namespace EduConnect.Core.Entities
         public int? Duration { get; set; }         // Süre (örneğin, saat cinsinden)
         public string Instructor { get; set; }     // Eğitmen adı
         public int? Capacity { get; set; }         // Kurs kapasitesi
-        public ICollection<Student> Students { get; set; }
+        public ICollection<Student> Students { get; set; } = new List<Student>(); 
     }
 }
