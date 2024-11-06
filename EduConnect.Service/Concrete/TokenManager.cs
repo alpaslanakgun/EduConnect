@@ -36,11 +36,12 @@ namespace EduConnect.Services.ConcreteTokenService
             var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
 
             var jwtSecurityToken = new JwtSecurityToken(
-                _tokenOption.Issuer,
-                expires: accessTokenExpiration,
-                notBefore: DateTime.Now,
-                claims: GetClaims(userDto, _tokenOption.Audience), // Roller burada ekleniyor
-                signingCredentials: signingCredentials);
+     _tokenOption.Issuer,
+     audience: _tokenOption.Audience[0], // İlk audience değeri
+     claims: GetClaims(userDto, _tokenOption.Audience),
+     notBefore: DateTime.Now,
+     expires: accessTokenExpiration,
+     signingCredentials: signingCredentials);
 
             var handler = new JwtSecurityTokenHandler();
             var token = handler.WriteToken(jwtSecurityToken);
@@ -100,20 +101,20 @@ namespace EduConnect.Services.ConcreteTokenService
 
         private IEnumerable<Claim> GetClaims(UserDto userDto, List<string> audiences)
         {
-        var claims = new List<Claim>
+            var claims = new List<Claim>
     {
         new Claim(ClaimTypes.NameIdentifier, userDto.Id.ToString()),
         new Claim(ClaimTypes.Name, userDto.UserName),
         new Claim(ClaimTypes.Email, userDto.Email)
     };
 
-    // Kullanıcının rollerini ekleyin
-    foreach (var role in userDto.Roles)
-    {
-        claims.Add(new Claim(ClaimTypes.Role, role));
-    }
+            // Kullanıcının rollerini ekleyin
+            foreach (var role in userDto.Roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
-    return claims;
+            return claims;
         }
 
         private IEnumerable<Claim> GetClaimsByClient(Client client)

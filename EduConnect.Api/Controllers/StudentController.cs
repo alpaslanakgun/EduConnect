@@ -1,4 +1,5 @@
-﻿using EduConnect.Api.Filters;
+﻿
+using EduConnect.Api.Filters;
 using EduConnect.Core.DTOs;
 using EduConnect.Services.Abstract;
 using Microsoft.AspNetCore.Authorization;
@@ -28,7 +29,6 @@ namespace EduConnect.Api.Controllers
 
         // GET: api/student/{id}
         [HttpGet("{id}")]
-        [RoleAuthorize("Admin")]
         public async Task<IActionResult> Get(int id)
         {
 
@@ -38,7 +38,7 @@ namespace EduConnect.Api.Controllers
 
         // POST: api/student
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [RoleAuthorize("Admin")]
         public async Task<IActionResult> Add(StudentDto studentDto)
         {
             var result = await _studentService.AddAsync(studentDto);

@@ -1,7 +1,10 @@
 ﻿using EduConnect.Core.DTOs;
 using EduConnect.Services.Abstract;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
+using System.Security.Claims;
 
 namespace EduConnect.Api.Controllers
 {
@@ -33,6 +36,7 @@ namespace EduConnect.Api.Controllers
 
             return BadRequest(result.Message); 
         }
+
 
         [HttpPost("create-token-by-client")]
         public async Task<IActionResult> CreateTokenByClient(ClientLoginDto clientLoginDto)

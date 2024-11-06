@@ -9,20 +9,15 @@ using EduConnect.Data.Context;
 using EduConnect.Repository.Repositories;
 using EduConnect.Repository.UnitOfWork;
 using EduConnect.Services.Abstract;
-using EduConnect.Services.Common.JwtService;
 using EduConnect.Services.Concrete;
 using EduConnect.Services.ConcreteTokenService;
 using EduConnect.Services.Extensions;
 using EduConnect.Services.Mapping;
 using FluentValidation;
-using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System;
 using IAuthenticationService = EduConnect.Services.Abstract.IAuthenticationService;
 
 
@@ -66,12 +61,14 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddAutoMapper(typeof(MapProfile));
 
 
-
+// Appsettings'den TokenOptions'u yükle
 builder.Services.Configure<CustomTokenOption>(builder.Configuration.GetSection("TokenOption"));
 
-builder.Services.Configure<List<Client>>(builder.Configuration.GetSection("Clients"));
-var tokenOptions = builder.Configuration.GetSection("TokenOption").Get<CustomTokenOption>();
-builder.Services.AddCustomTokenAuth(tokenOptions);
+// JWT yapýlandýrmasýný uygula
+builder.Services.AddCustomTokenAuth(builder.Configuration);
+
+
+
 
 builder.Services.AddCors(options => options.AddDefaultPolicy(builder =>
 {
@@ -88,15 +85,13 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "EduConnect API", Version = "v1" });
-
-    // JWT Bearer Auth
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
-        Description = "Lütfen Bearer [token] þeklinde giriþ yapýn.",
+        Description = "JWT Bearer token 'Bearer {token}' formatýnda giriniz.",
         Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
     });
 
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -115,7 +110,10 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+
 var app = builder.Build();
+
+
 
 
 // Configure the HTTP request pipeline.
