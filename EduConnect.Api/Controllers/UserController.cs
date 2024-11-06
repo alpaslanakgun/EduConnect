@@ -39,5 +39,12 @@ namespace EduConnect.Api.Controllers
             return BadRequest(getUser.Message);
 
         }
+        [HttpPost("assign-role")]
+        public async Task<IActionResult> AssignRole([FromBody] AssignRoleDto assignRoleDto)
+        {
+            var result = await _userService.AssignRoleToUserAsync(assignRoleDto.UserEmail, assignRoleDto.Role);
+            return result.Success ? Ok(result.Data) : BadRequest(result.Message);
+        }
+
     }
 }

@@ -13,5 +13,7 @@ namespace EduConnect.Services.Abstract
         Task<IDataResult<UserDto>> CreateUserAsync(CreateUserDto createUserDto);
 
         Task<IDataResult<UserDto>> GetUserByNameAsync(string userName);
+        Task<IDataResult<UserDto>> AssignRoleToUserAsync(string userEmail, string role);
+
     }
 }

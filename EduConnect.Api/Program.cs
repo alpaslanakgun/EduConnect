@@ -1,4 +1,5 @@
 using EduConnect.Core.Configuration;
+using EduConnect.Core.Identity;
 using EduConnect.Core.Models;
 using EduConnect.Core.Repositories;
 using EduConnect.Core.UnitOfWorks;
@@ -87,5 +88,10 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    await RoleInitializer.InitializeAsync(roleManager);
+}
 
 app.Run();

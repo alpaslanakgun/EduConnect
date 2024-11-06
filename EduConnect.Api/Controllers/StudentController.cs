@@ -1,4 +1,5 @@
-﻿using EduConnect.Core.DTOs;
+﻿using EduConnect.Api.Filters;
+using EduConnect.Core.DTOs;
 using EduConnect.Services.Abstract;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -34,6 +35,7 @@ namespace EduConnect.Api.Controllers
 
         // POST: api/student
         [HttpPost]
+        [RoleAuthorize("Admin")]
         public async Task<IActionResult> Add(StudentDto studentDto)
         {
             var result = await _studentService.AddAsync(studentDto);
@@ -41,6 +43,7 @@ namespace EduConnect.Api.Controllers
         }
 
         [HttpPost("with-courses")]
+        [RoleAuthorize("Admin")]
         public async Task<IActionResult> AddWithCourses([FromBody] StudentDto studentDto, [FromQuery] List<int> courseIds)
         {
             var result = await _studentService.AddStudentWithCoursesAsync(studentDto, courseIds);
@@ -50,6 +53,7 @@ namespace EduConnect.Api.Controllers
 
         // PUT: api/student
         [HttpPut]
+        [RoleAuthorize("Admin")]
         public async Task<IActionResult> Update(StudentDto studentDto)
         {
             var result = await _studentService.UpdateAsync(studentDto);
@@ -58,6 +62,7 @@ namespace EduConnect.Api.Controllers
 
         // DELETE: api/student/{id}
         [HttpDelete("{id}")]
+        [RoleAuthorize("Admin")]
         public async Task<IActionResult> Remove(int id)
         {
             var result = await _studentService.DeleteAsync(id);
