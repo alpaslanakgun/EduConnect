@@ -3,6 +3,7 @@ using EduConnect.Api.Filters;
 using EduConnect.Core.DTOs;
 using EduConnect.Services.Abstract;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,10 +14,13 @@ namespace EduConnect.Api.Controllers
     public class StudentController : ControllerBase
     {
         private readonly IStudentService _studentService;
+        private readonly IDataProtectionProvider _dataProtectionProvider;
 
-        public StudentController(IStudentService studentService)
+
+        public StudentController(IStudentService studentService, IDataProtectionProvider dataProtectionProvider)
         {
             _studentService = studentService;
+            _dataProtectionProvider = dataProtectionProvider;
         }
 
         // GET: api/student
@@ -41,6 +45,9 @@ namespace EduConnect.Api.Controllers
         [RoleAuthorize("Admin")]
         public async Task<IActionResult> Add(StudentDto studentDto)
         {
+            // Öğrenci bilgilerini şifrelİyoruz
+            var protector = _dataProtectionProvider.CreateProtector("StudentDataProtection");
+            studentDto.Email = protector.Protect(studentDto.Email); // Örneğin e-posta adresini şifreledik.
             var result = await _studentService.AddAsync(studentDto);
             return result.Success ? Ok(result.Data) : BadRequest(result.Message);
         }
@@ -59,6 +66,9 @@ namespace EduConnect.Api.Controllers
         [RoleAuthorize("Admin")]
         public async Task<IActionResult> Update(StudentDto studentDto)
         {
+            // Eğer güncelleme işlemi için şifrelenmiş verileri çözecekseniz
+            var protector = _dataProtectionProvider.CreateProtector("StudentDataProtection");
+            studentDto.Email = protector.Unprotect(studentDto.Email); // Şifre çözme işlemi
             var result = await _studentService.UpdateAsync(studentDto);
             return result.Success ? Ok(result.Data) : BadRequest(result.Message);
         }

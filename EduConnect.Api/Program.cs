@@ -15,6 +15,7 @@ using EduConnect.Services.ConcreteTokenService;
 using EduConnect.Services.Extensions;
 using EduConnect.Services.Mapping;
 using FluentValidation;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +29,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+builder.Services.AddDataProtection()
+           .PersistKeysToFileSystem(new DirectoryInfo(@"C:\keys")) // Anahtarlarýn kaydedileceði dizin
+           .SetApplicationName("EduConnect");
 
 builder.Services.AddValidatorsFromAssemblyContaining<CourseDtoValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateUserDtoValidator>();
