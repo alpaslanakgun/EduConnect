@@ -1,6 +1,7 @@
 ﻿using EduConnect.Api.Filters;
 using EduConnect.Core.DTOs;
 using EduConnect.Services.Abstract;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -35,6 +36,7 @@ namespace EduConnect.Api.Controllers
         }
 
         // POST: api/course
+        [Authorize]
         [HttpPost]
         [RoleAuthorize("Admin")]
         public async Task<IActionResult> Add(CourseDto courseDto)

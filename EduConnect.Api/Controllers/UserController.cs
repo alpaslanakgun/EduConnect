@@ -19,7 +19,7 @@ namespace EduConnect.Api.Controllers
         //api/user
         [HttpPost]
         public async Task<IActionResult> CreateUser(CreateUserDto createUserDto)
-        {
+        { 
             var userResult = await _userService.CreateUserAsync(createUserDto);
 
             return userResult.Success

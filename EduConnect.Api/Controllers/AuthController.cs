@@ -15,7 +15,7 @@ namespace EduConnect.Api.Controllers
             _authenticationService = authenticationService;
         }
         //api/auth/
-        [HttpPost("create-token")]
+        [HttpPost("login")]
         public async Task<IActionResult> CreateToken(LoginDto loginDto)
         {
 
