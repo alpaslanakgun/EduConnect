@@ -1,3 +1,4 @@
+using EduConnect.Api.Middlewares;
 using EduConnect.Api.Validations;
 using EduConnect.Core.Configuration;
 using EduConnect.Core.Identity;
@@ -114,7 +115,7 @@ builder.Services.AddSwaggerGen(c =>
 var app = builder.Build();
 
 
-
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
